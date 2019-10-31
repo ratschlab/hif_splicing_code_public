@@ -13,17 +13,24 @@ get_PSI_values <- function(res_table, psi_table_file){
   psi_table = data.frame(fread(psi_table_file))
 
   psi_table_val = psi_table[,grep("psi", colnames(psi_table), value=T)]
-  hyp_siCTRL_psi = rowMeans(psi_table_val[,grep("Hypoxia_siControl", colnames(psi_table_val))], na.rm=T)
-  other_psi = rowMeans(psi_table_val[,grep("Hypoxia_siControl", colnames(psi_table_val), invert=T)], na.rm=T)
+  hyp_siCTRL_psi = rowMeans(psi_table_val[,grep("Hypoxia_siControl",
+                            colnames(psi_table_val))], na.rm=T)
+  other_psi = rowMeans(psi_table_val[,grep("Hypoxia_siControl",
+                        colnames(psi_table_val), invert=T)], na.rm=T)
 
   delta_PSI = hyp_siCTRL_psi - other_psi
 
-  hyp_siCTRL_psi = rowMeans(psi_table_val[,grep("Hypoxia_siControl", colnames(psi_table_val))], na.rm=T)
-  hyp_siARNT_psi = rowMeans(psi_table_val[,grep("Hypoxia_siARNT", colnames(psi_table_val))], na.rm=T)
-  norm_siCTRL_psi = rowMeans(psi_table_val[,grep("Normoxia_siControl", colnames(psi_table_val))], na.rm=T)
-  norm_siARNT_psi = rowMeans(psi_table_val[,grep("Normoxia_siARNT", colnames(psi_table_val))], na.rm=T)
+  hyp_siCTRL_psi = rowMeans(psi_table_val[,grep("Hypoxia_siControl",
+                                            colnames(psi_table_val))], na.rm=T)
+  hyp_siARNT_psi = rowMeans(psi_table_val[,grep("Hypoxia_siARNT",
+                                            colnames(psi_table_val))], na.rm=T)
+  norm_siCTRL_psi = rowMeans(psi_table_val[,grep("Normoxia_siControl",
+                                            colnames(psi_table_val))], na.rm=T)
+  norm_siARNT_psi = rowMeans(psi_table_val[,grep("Normoxia_siARNT",
+                                              colnames(psi_table_val))], na.rm=T)
 
-  relative_delta_PSI = (hyp_siCTRL_psi-norm_siCTRL_psi) - (hyp_siARNT_psi-norm_siARNT_psi)
+  relative_delta_PSI = (hyp_siCTRL_psi-norm_siCTRL_psi) -
+                        (hyp_siARNT_psi-norm_siARNT_psi)
 
   psi_table = data.frame(event_id = psi_table$event_id, delta_PSI, relative_delta_PSI)
 
@@ -34,7 +41,8 @@ get_PSI_values <- function(res_table, psi_table_file){
 
 get_event_coor <- function(res_table, outname){
 
-  spladder_file = paste(indir, "/merge_graphs_", outname, "_C3.confirmed.icgc.txt", sep="")
+  spladder_file = paste(indir, "/merge_graphs_", outname,
+                        "_C3.confirmed.icgc.txt", sep="")
   spladder_res = data.frame(fread(spladder_file))
   spladder_res = spladder_res[,c(1,3,4,5)]
 
@@ -59,17 +67,20 @@ read_in_spladder_counts <- function(countTable_file1){
 
 	gene_info = countsTable[,c(1,2)]
 
-	col_interest = c(grep("gene_exp[.]", colnames(countsTable)), grep("event_count[.]", colnames(countsTable)))
+	col_interest = c(grep("gene_exp[.]", colnames(countsTable)),
+                  grep("event_count[.]", colnames(countsTable)))
 	countsTable = countsTable[,col_interest]
 	countsTable = ceiling(countsTable)
 
-	colnames(countsTable) = sapply(strsplit(colnames(countsTable), "[.]sorted"),function(x) x[1])
+	colnames(countsTable) = sapply(strsplit(colnames(countsTable), "[.]sorted"),
+                                function(x) x[1])
 
 	countsTable = cbind(gene_info, countsTable)
 	return(countsTable)
 }
 
-filter_and_plot <- function(countsTable, design, plot_colors, RESULTS_FOLDER, plot_main, run_splice_only=TRUE){
+filter_and_plot <- function(countsTable, design, plot_colors, RESULTS_FOLDER,
+                            plot_main, run_splice_only=TRUE){
 
 	#get plot labels
 	plot_labels = colnames(countsTable)
@@ -91,23 +102,33 @@ filter_and_plot <- function(countsTable, design, plot_colors, RESULTS_FOLDER, pl
 	event_idx = which(!design$count_type == "exp")
 
 	pdf(paste(RESULTS_FOLDER, "exp_log2.pdf", sep=""))
-	boxplot(log2(countsTableFiltered[,exp_idx]+1), las=2, main="Raw log2 Values of Expression", col=plot_colors[exp_idx])
+	boxplot(log2(countsTableFiltered[,exp_idx]+1), las=2,
+            main="Raw log2 Values of Expression", col=plot_colors[exp_idx])
 	dev.off()
 
 	if(length(event_idx) > 0){
 		pdf(paste(RESULTS_FOLDER, "event_log2.pdf", sep=""))
-			boxplot(log2(countsTableFiltered[,event_idx]+1), las=2, main="Raw log2 Values of Expression", col=plot_colors[event_idx])
+			boxplot(log2(countsTableFiltered[,event_idx]+1), las=2,
+              main="Raw log2 Values of Expression", col=plot_colors[event_idx])
 		dev.off()
-		plot_pca(countsTableFiltered[,event_idx], paste(RESULTS_FOLDER, "event_pca.pdf", sep=""), plot_colors[event_idx], plot_labels[event_idx], plot_main)
-		hierarchical_clust(countsTableFiltered[,event_idx], paste(RESULTS_FOLDER, "event_samp_clust.pdf", sep=""), plot_main)
+		plot_pca(countsTableFiltered[,event_idx],
+              paste(RESULTS_FOLDER, "event_pca.pdf", sep=""),
+              plot_colors[event_idx], plot_labels[event_idx], plot_main)
+		hierarchical_clust(countsTableFiltered[,event_idx],
+                        paste(RESULTS_FOLDER, "event_samp_clust.pdf", sep=""),
+                        plot_main)
 	}
 
 
 	#plot the pca of samples
-	plot_pca(countsTableFiltered[,exp_idx], paste(RESULTS_FOLDER, "exp_pca.pdf", sep=""), plot_colors[exp_idx], plot_labels[exp_idx], plot_main)
+	plot_pca(countsTableFiltered[,exp_idx],
+            paste(RESULTS_FOLDER, "exp_pca.pdf", sep=""),
+            plot_colors[exp_idx], plot_labels[exp_idx], plot_main)
 
 	# plot the clustering
-	hierarchical_clust(countsTableFiltered[,exp_idx], paste(RESULTS_FOLDER, "exp_samp_clust.pdf", sep=""), plot_main)
+	hierarchical_clust(countsTableFiltered[,exp_idx],
+                        paste(RESULTS_FOLDER, "exp_samp_clust.pdf", sep=""),
+                        plot_main)
 
 
 	return(countsTableFiltered)
@@ -128,7 +149,10 @@ translate_ENS_to_HGNC <- function(in_table, translation_file){
 }
 
 
-write_results_individial_analysis <- function(res, countsTable, design, gene_event_table, outname, RESULTS_FOLDER, psi_table_file, translation_file){
+write_results_individial_analysis <- function(res, countsTable, design,
+                                              gene_event_table, outname,
+                                              RESULTS_FOLDER, psi_table_file,
+                                              translation_file){
 
   # translate gene ids
 	res = merge(gene_event_table, res, by="event_id")
@@ -154,7 +178,9 @@ write_results_individial_analysis <- function(res, countsTable, design, gene_eve
 
 
   #write out table
-  write.table(event_count_table, paste(RESULTS_FOLDER, "/", outname, ".tsv", sep=""), quote=F, col.name=T, row.name=F, sep="\t")
+  write.table(event_count_table,
+              paste(RESULTS_FOLDER, "/", outname, ".tsv", sep=""),
+              quote=F, col.name=T, row.name=F, sep="\t")
 
 
 
@@ -163,11 +189,14 @@ write_results_individial_analysis <- function(res, countsTable, design, gene_eve
 
 
 	pdf(paste(RESULTS_FOLDER, "/", outname, "_heatmap_total.pdf", sep=""))
-		try(pheatmap(event_count_table[,sample_ids], annotation_col=annot_info, cluster_cols=TRUE, show_rownames=FALSE))
+		try(pheatmap(event_count_table[,sample_ids],
+                  annotation_col=annot_info, cluster_cols=TRUE,
+                  show_rownames=FALSE))
 	dev.off()
 
   event_count_table_sig = event_count_table[event_count_table$p_adj < 0.1,]
-  event_count_table_sig = event_count_table_sig[order(abs(event_count_table_sig$estimate), decreasing=T),]
+  event_count_table_sig =
+    event_count_table_sig[order(abs(event_count_table_sig$estimate), decreasing=T),]
   print(dim(event_count_table_sig))
 
 	pdf(paste(RESULTS_FOLDER, "/", outname, "_heatmap_gene_names.pdf", sep=""))
@@ -199,11 +228,17 @@ write_results_individial_analysis <- function(res, countsTable, design, gene_eve
 	for(idx in 1:50){
 		plot_counts = data.frame(count=unlist(event_count_table_sig[idx,sample_ids]),annot_info)
 
-		curr_gene_name = event_count_table_sig[which(event_count_table_sig$event_id == gene_event_table$event_id[idx]),"hgnc_symbol"]
-		curr_event = event_count_table_sig[which(event_count_table_sig$event_id == gene_event_table$event_id[idx]),"event_id"]
+		curr_gene_name = event_count_table_sig[
+                      which(event_count_table_sig$event_id == gene_event_table$event_id[idx]),
+                      "hgnc_symbol"]
+		curr_event = event_count_table_sig[
+                    which(event_count_table_sig$event_id == gene_event_table$event_id[idx]),
+                    "event_id"]
 
-		curr_plot <- ggplot(plot_counts, aes(x=o2_status, y=count, color=hif_status, group=hif_status)) +
-			geom_point() + stat_smooth(se=FALSE,method="loess") + ggtitle(paste(curr_gene_name, "\n", curr_event, sep=""))
+		curr_plot <- ggplot(plot_counts,
+                        aes(x=o2_status, y=count, color=hif_status, group=hif_status)) +
+			          geom_point() + stat_smooth(se=FALSE,method="loess") +
+                ggtitle(paste(curr_gene_name, "\n", curr_event, sep=""))
 		print(curr_plot)
 	}
 	dev.off()
@@ -239,7 +274,10 @@ get_nb_corrected_value <- function(res, linear_model_df){
 }
 
 
-do_individual_DE_analysis <- function(design, plot_colors, countsTable, RESULTS_FOLDER, plot_main, gene_event_table, outname, psi_table_file, translation_file, run_splice_only=TRUE){
+do_individual_DE_analysis <- function(design, plot_colors, countsTable,
+                                      RESULTS_FOLDER, plot_main, gene_event_table,
+                                      outname, psi_table_file, translation_file,
+                                      run_splice_only=TRUE){
 
 
   	#now that we have the conditions we are interested in comparing, lets normalize
