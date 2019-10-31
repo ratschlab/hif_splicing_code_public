@@ -6,7 +6,6 @@ library("ggplot2")
 library("MASS")
 library("pheatmap")
 library("plyr")
-library("genefilter")
 
 get_PSI_values <- function(res_table, psi_table_file){
 
@@ -594,5 +593,5 @@ if(run_splice_only){
   a5_res = run(outname="alt_5prime", indir=indir, RESULTS_FOLDER=RESULTS_FOLDER, translation_file, run_splice_only=FALSE)
 
   make_heatmap_plot(RESULTS_FOLDER, run_splice_only=FALSE, indir)
- 
+
 }
