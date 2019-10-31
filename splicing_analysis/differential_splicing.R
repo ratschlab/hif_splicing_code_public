@@ -595,4 +595,4 @@ if(run_splice_only){
 
   make_heatmap_plot(RESULTS_FOLDER, run_splice_only=FALSE, indir)
 
-}
+} 
